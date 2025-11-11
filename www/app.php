@@ -3,6 +3,10 @@
 $parts = explode('/', $_SERVER['REQUEST_URI']);
 array_shift($parts);
 $host = basename(array_shift($parts));
+
+if (!str_ends_with($host, 'c3re.de')) {
+    exit();
+}
 $file = implode('/', $parts);
 $content = file_get_contents('php://input');
 
