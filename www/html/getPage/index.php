@@ -4,6 +4,7 @@ chdir(__DIR__ . '/../../data/');
 header('Content-Type: text/plain');
 
 $hosts = glob('*', GLOB_ONLYDIR);
+// todo: filter old entries
 natsort($hosts);
 
 foreach ($hosts as $host) {
@@ -12,7 +13,8 @@ foreach ($hosts as $host) {
     natsort($services);
     foreach ($services as $servicePathFile) {
         $service = basename(dirname(trim(file_get_contents($servicePathFile))));
-        echo " - $service\n";
+        echo " - [$service](./$service)\n";
     }
     echo "\n\n";
 }
+
