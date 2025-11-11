@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+chown www-data:www-data /var/www/ -R
+/usr/sbin/apache2ctl -D FOREGROUND
