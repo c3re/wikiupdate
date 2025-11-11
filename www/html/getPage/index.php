@@ -1,6 +1,7 @@
 <?php
 
 chdir(__DIR__ . '/../../data/');
+header('Content-Type: text/plain');
 
 $hosts = glob('*', GLOB_ONLYDIR);
 natsort($hosts);
