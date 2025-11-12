@@ -13,8 +13,7 @@ foreach ($hosts as $host) {
     natsort($services);
     foreach ($services as $servicePathFile) {
         $service = basename(dirname(trim(file_get_contents($servicePathFile))));
-        echo " - [$service](./$service)\n";
+        echo " - [$service](./Dienste-Intern/$service)\n";
     }
     echo "\n\n";
 }
-
