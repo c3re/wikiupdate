@@ -52,7 +52,14 @@ if (!is_file('last_dienste-intern_index.md')) {
     touch('last_dienste-intern_index.md');
 }
 
-$lastContent = file_get_contents('last_dienste-intern_index.md');
+$fp = fopen('last_dienste-intern_index.md', 'a+');
+fseek($fp, 0);
+
+while (!flock($fp, LOCK_EX)) {
+    usleep(10000);
+}
+$lastContent = fread($fp, filesize('last_dienste-intern_index.md'));
+
 if ($content === $lastContent) {
     exit();
 }
@@ -70,60 +77,11 @@ $result = updateWikiPage(
     '',
 );
 
-file_put_contents('last_dienste-intern_index.md', $content);
-
-function getWikiPage($endpoint, $apiToken, $pageId) {
-    $query = 'query GetPage($id: Int!) {
-        pages {
-            single(id: $id) {
-                id
-                path
-                title
-                description
-                content
-                editor
-                tags
-            }
-        }
-    }';
-
-    $graphqlRequest = json_encode([
-        'query' => $query,
-        'variables' => ['id' => (int) $pageId],
-    ]);
-
-    $ch = curl_init($endpoint);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => $graphqlRequest,
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiToken,
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_TIMEOUT => 30,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($response === false || $httpCode !== 200) {
-        return ['success' => false];
-    }
-
-    $responseData = json_decode($response, true);
-
-    if (isset($responseData['data']['pages']['single'])) {
-        return [
-            'success' => true,
-            'page' => $responseData['data']['pages']['single'],
-        ];
-    }
-
-    return ['success' => false];
-}
+ftruncate($fp, 0);
+fseek($fp, 0);
+fwrite($fp, $content);
+flock($fp, LOCK_UN);
+fclose($fp);
 
 /**
  * Update a page in Wiki.js using GraphQL API
@@ -146,21 +104,6 @@ function updateWikiPage(
     $tags = null,
 ) {
     // Fetch current page data to get tags and other fields
-    $pageData = getWikiPage($endpoint, $apiToken, $pageId);
-    if ($pageData['success']) {
-        "\n";
-        if ($title === null && isset($pageData['page']['title'])) {
-            $title = $pageData['page']['title'];
-        }
-        if ($description === null && isset($pageData['page']['description'])) {
-            $description = $pageData['page']['description'];
-        }
-        if ($tags === null && isset($pageData['page']['tags'])) {
-            $tags = $pageData['page']['tags'];
-        }
-    } else {
-        echo "DEBUG: Failed to fetch current page data\n";
-    }
 
     // Ensure we have at least empty strings/arrays
     if ($title === null) {
