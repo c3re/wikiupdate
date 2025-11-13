@@ -20,7 +20,7 @@ file_put_contents($fileStoragePath . '.data', $content);
 file_put_contents($fileStoragePath . '.path', $file);
 
 // update page:
-chdir(__DIR__ . '/../../data/');
+chdir(__DIR__ . '/data/');
 
 $hosts = glob('*', GLOB_ONLYDIR);
 // todo: filter old entries
@@ -48,9 +48,11 @@ foreach ($hosts as $host) {
 }
 
 $lastContent = '';
-if (is_file('last_dienste-intern_index.md')) {
-    $lastContent = file_get_contents('last_dienste-intern_index.md');
+if (!is_file('last_dienste-intern_index.md')) {
+    touch('last_dienste-intern_index.md');
 }
+
+$lastContent = file_get_contents('last_dienste-intern_index.md');
 if ($content === $lastContent) {
     exit();
 }
@@ -59,7 +61,14 @@ $endpoint = 'https://wiki.c3re.de/graphql';
 $apiToken = $_SERVER['TOKEN'];
 $pageId = 225;
 
-$result = updateWikiPage($endpoint, $apiToken, $pageId, $content);
+$result = updateWikiPage(
+    $endpoint,
+    $apiToken,
+    $pageId,
+    $content,
+    'Dienste-Intern',
+    '',
+);
 
 file_put_contents('last_dienste-intern_index.md', $content);
 
