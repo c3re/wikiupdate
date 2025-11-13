@@ -58,7 +58,7 @@ fseek($fp, 0);
 while (!flock($fp, LOCK_EX)) {
     usleep(10000);
 }
-$lastContent = fread($fp, filesize('last_dienste-intern_index.md'));
+$lastContent = fread($fp, min(1, filesize('last_dienste-intern_index.md')));
 
 if ($content === $lastContent) {
     exit();
