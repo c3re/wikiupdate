@@ -65,7 +65,7 @@ if ($content === $lastContent) {
 }
 
 $endpoint = 'https://wiki.c3re.de/graphql';
-$apiToken = $_SERVER['TOKEN'];
+$apiToken = file_get_contents(__DIR__ . '/.token');
 $pageId = 225;
 
 $result = updateWikiPage(
