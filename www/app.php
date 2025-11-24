@@ -36,6 +36,10 @@ foreach ($hosts as $host) {
     $content .= "# Host: $host\n\n";
     $services = glob("$host/*.path");
 
+    $services = array_filter($services, function ($servicePathFile) {
+        return filemtime($servicePathFile) >= time() - 60 * 60;
+    });
+
     usort($services, function ($a, $b) {
         return strnatcasecmp(file_get_contents($a), file_get_contents($b));
     });
