@@ -14,6 +14,7 @@ $hostDir = __DIR__ . "/data/$host";
 if (!is_dir($hostDir)) {
     mkdir($hostDir, 0777, true);
 }
+touch($hostDir);
 $fileStoragePath = $hostDir . '/' . md5($file);
 
 file_put_contents($fileStoragePath . '.data', $content);
@@ -100,7 +101,7 @@ fclose($fp);
  */
 function updateWikiPage(
     $endpoint,
-    $apiToken,
+    #[SensitiveParameter] $apiToken,
     $pageId,
     $content,
     $title = null,
